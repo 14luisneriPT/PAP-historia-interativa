@@ -1,44 +1,6 @@
 {
-    "scene_001": {
-
-        "title": "Introduction",
-
-        "video": "stories/demo/videos/intro.mp4",
-
-        "choices": [
-
-            {
-                "text": "Go left",
-                "next": "scene_002"
-            },
-
-            {
-                "text": "Go right",
-                "next": "scene_003"
-            }
-
-        ]
-
-    },
-
-    "scene_002": {
-
-        "title": "Left Path",
-
-        "video": "stories/demo/videos/left.mp4",
-
-        "choices": []
-
-    },
-
-    "scene_003": {
-
-        "title": "Right Path",
-
-        "video": "stories/demo/videos/right.mp4",
-
-        "choices": []
-
-    }
-
+    "title": "Interactive History",
+    "author": "Luis",
+    "version": "1.0",
+    "firstScene": "scene_001"
 }
