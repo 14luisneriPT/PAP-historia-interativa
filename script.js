@@ -152,4 +152,65 @@ function validateScene(sceneID, scene) {
         });
 
     }
+const mapDiv = document.getElementById("map");
+let mapVisible = false;
+
+// Toggle map
+function toggleMap() {
+
+    mapVisible = !mapVisible;
+
+    if (mapVisible) {
+        renderMap();
+        mapDiv.style.display = "flex";
+    } else {
+        mapDiv.style.display = "none";
+    }
+
+}
+
+// Render all scenes
+function renderMap() {
+
+    mapDiv.innerHTML = "";
+
+    const scenes = Engine.scenes;
+
+    Object.keys(scenes).forEach(sceneID => {
+
+        const scene = scenes[sceneID];
+
+        const node = document.createElement("div");
+        node.className = "map-node";
+
+        node.innerHTML = `
+            <b>${sceneID}</b><br>
+            ${scene.title || ""}
+        `;
+
+        node.onclick = () => {
+            loadScene(sceneID);
+            toggleMap();
+        };
+
+        mapDiv.appendChild(node);
+
+        // draw connections
+        if (scene.choices) {
+
+            scene.choices.forEach(choice => {
+
+                const line = document.createElement("div");
+                line.className = "map-line";
+
+                line.innerText = `${sceneID} → ${choice.next}`;
+
+                mapDiv.appendChild(line);
+
+            });
+
+        }
+
+    });
+
 }
