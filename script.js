@@ -1,60 +1,81 @@
-// ===========================
-// Configuration
-// ===========================
+// ==============================
+// ENGINE
+// ==============================
 
-const CONFIG = {
-    storyFile: "stories/demo/story.json"
+const Engine = {
+
+    settings: {},
+    story: {},
+    scenes: {},
+    currentScene: null
+
 };
 
-// ===========================
-// Variables
-// ===========================
-
-let story = {};
-let currentScene = null;
+// ==============================
+// HTML
+// ==============================
 
 const video = document.getElementById("videoPlayer");
 const choicesDiv = document.getElementById("choices");
 
-// ===========================
-// Start Engine
-// ===========================
+// ==============================
+// START
+// ==============================
 
-loadStory();
+init();
 
-// ===========================
-// Functions
-// ===========================
+// ==============================
+// INITIALIZATION
+// ==============================
 
-async function loadStory() {
+async function init() {
 
     try {
 
-        const response = await fetch(CONFIG.storyFile);
-        story = await response.json();
+        // Load settings
+        const settingsResponse = await fetch("settings.json");
+        Engine.settings = await settingsResponse.json();
 
-        loadScene("scene_001");
+        // Load story information
+        const storyResponse = await fetch("story.json");
+        Engine.story = await storyResponse.json();
 
-    } catch (error) {
+        // Load scenes
+        const scenesResponse = await fetch("scenes.json");
+        Engine.scenes = await scenesResponse.json();
 
-        console.error("Could not load story:", error);
+        // Apply settings
+        video.controls = Engine.settings.showControls;
+
+        // Load first scene
+        loadScene(Engine.story.firstScene);
+
+    }
+
+    catch(error){
+
+        console.error("Engine failed to start.", error);
 
     }
 
 }
 
-function loadScene(sceneID) {
+// ==============================
+// LOAD SCENE
+// ==============================
 
-    const scene = story[sceneID];
+function loadScene(sceneID){
 
-    if (!scene) {
+    const scene = Engine.scenes[sceneID];
+
+    if(!scene){
 
         console.error("Scene not found:", sceneID);
         return;
 
     }
 
-    currentScene = sceneID;
+    Engine.currentScene = sceneID;
 
     choicesDiv.innerHTML = "";
     choicesDiv.style.display = "none";
@@ -71,9 +92,13 @@ function loadScene(sceneID) {
 
 }
 
-function showChoices(choices) {
+// ==============================
+// SHOW CHOICES
+// ==============================
 
-    if (!choices || choices.length === 0)
+function showChoices(choices){
+
+    if(!choices || choices.length === 0)
         return;
 
     choicesDiv.innerHTML = "";
