@@ -1,0 +1,17 @@
+{
+  "intro": {
+    "video": "videos/intro.mp4",
+    "choices": [
+      { "text": "Go left", "next": "left" },
+      { "text": "Go right", "next": "right" }
+    ]
+  },
+  "left": {
+    "video": "videos/left.mp4",
+    "choices": []
+  },
+  "right": {
+    "video": "videos/right.mp4",
+    "choices": []
+  }
+}
