@@ -1,1 +1,28 @@
+{
+    "scene_001": {
+        "title": "Introduction",
+        "video": "videos/intro.mp4",
+        "choices": [
+            {
+                "text": "Go left",
+                "next": "scene_002"
+            },
+            {
+                "text": "Go right",
+                "next": "scene_003"
+            }
+        ]
+    },
 
+    "scene_002": {
+        "title": "Left Path",
+        "video": "videos/left.mp4",
+        "choices": []
+    },
+
+    "scene_003": {
+        "title": "Right Path",
+        "video": "videos/right.mp4",
+        "choices": []
+    }
+}
