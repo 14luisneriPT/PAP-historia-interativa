@@ -1,44 +1,98 @@
+// ===========================
+// Configuration
+// ===========================
+
+const CONFIG = {
+    storyFile: "stories/demo/story.json"
+};
+
+// ===========================
+// Variables
+// ===========================
+
 let story = {};
-let currentNode = "intro";
+let currentScene = null;
 
 const video = document.getElementById("videoPlayer");
 const choicesDiv = document.getElementById("choices");
 
-fetch("story.json")
-  .then(res => res.json())
-  .then(data => {
-    story = data;
-    loadNode(currentNode);
-  });
+// ===========================
+// Start Engine
+// ===========================
 
-function loadNode(nodeName) {
-  const node = story[nodeName];
-  currentNode = nodeName;
+loadStory();
 
-  video.src = node.video;
-  video.play();
+// ===========================
+// Functions
+// ===========================
 
-  choicesDiv.innerHTML = "";
-  choicesDiv.style.display = "none";
+async function loadStory() {
 
-  video.onended = () => {
-    showChoices(node.choices);
-  };
+    try {
+
+        const response = await fetch(CONFIG.storyFile);
+        story = await response.json();
+
+        loadScene("scene_001");
+
+    } catch (error) {
+
+        console.error("Could not load story:", error);
+
+    }
+
+}
+
+function loadScene(sceneID) {
+
+    const scene = story[sceneID];
+
+    if (!scene) {
+
+        console.error("Scene not found:", sceneID);
+        return;
+
+    }
+
+    currentScene = sceneID;
+
+    choicesDiv.innerHTML = "";
+    choicesDiv.style.display = "none";
+
+    video.src = scene.video;
+
+    video.play();
+
+    video.onended = () => {
+
+        showChoices(scene.choices);
+
+    };
+
 }
 
 function showChoices(choices) {
-  if (!choices || choices.length === 0) return;
 
-  choicesDiv.style.display = "flex";
+    if (!choices || choices.length === 0)
+        return;
 
-  choices.forEach(choice => {
-    const btn = document.createElement("button");
-    btn.innerText = choice.text;
+    choicesDiv.innerHTML = "";
+    choicesDiv.style.display = "flex";
 
-    btn.onclick = () => {
-      loadNode(choice.next);
-    };
+    choices.forEach(choice => {
 
-    choicesDiv.appendChild(btn);
-  });
+        const button = document.createElement("button");
+
+        button.textContent = choice.text;
+
+        button.onclick = () => {
+
+            loadScene(choice.next);
+
+        };
+
+        choicesDiv.appendChild(button);
+
+    });
+
 }
