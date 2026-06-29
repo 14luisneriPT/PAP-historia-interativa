@@ -32,92 +32,44 @@ async function init() {
 
     try {
 
-        // Load settings
-        const settingsResponse = await fetch("settings.json");
-        Engine.settings = await settingsResponse.json();
+        console.log("Engine starting...");
 
-        // Load story information
-        const storyResponse = await fetch("story.json");
-        Engine.story = await storyResponse.json();
+        const [settingsRes, storyRes, scenesRes] = await Promise.all([
 
-        // Load scenes
-        const scenesResponse = await fetch("scenes.json");
-        Engine.scenes = await scenesResponse.json();
+            fetch("settings.json"),
+            fetch("story.json"),
+            fetch("scenes.json")
 
-        // Apply settings
+        ]);
+
+        Engine.settings = await settingsRes.json();
+        Engine.story = await storyRes.json();
+        Engine.scenes = await scenesRes.json();
+
+        console.log("Settings loaded:", Engine.settings);
+        console.log("Story loaded:", Engine.story);
+        console.log("Scenes loaded:", Object.keys(Engine.scenes));
+
         video.controls = Engine.settings.showControls;
 
-        // Load first scene
+        // safety check
+        if (!Engine.story.firstScene) {
+            console.error("ERROR: firstScene is missing in story.json");
+            return;
+        }
+
+        if (!Engine.scenes[Engine.story.firstScene]) {
+            console.error("ERROR: firstScene does not exist in scenes.json");
+            return;
+        }
+
         loadScene(Engine.story.firstScene);
 
     }
 
-    catch(error){
+    catch (error) {
 
         console.error("Engine failed to start.", error);
 
     }
-
-}
-
-// ==============================
-// LOAD SCENE
-// ==============================
-
-function loadScene(sceneID){
-
-    const scene = Engine.scenes[sceneID];
-
-    if(!scene){
-
-        console.error("Scene not found:", sceneID);
-        return;
-
-    }
-
-    Engine.currentScene = sceneID;
-
-    choicesDiv.innerHTML = "";
-    choicesDiv.style.display = "none";
-
-    video.src = scene.video;
-
-    video.play();
-
-    video.onended = () => {
-
-        showChoices(scene.choices);
-
-    };
-
-}
-
-// ==============================
-// SHOW CHOICES
-// ==============================
-
-function showChoices(choices){
-
-    if(!choices || choices.length === 0)
-        return;
-
-    choicesDiv.innerHTML = "";
-    choicesDiv.style.display = "flex";
-
-    choices.forEach(choice => {
-
-        const button = document.createElement("button");
-
-        button.textContent = choice.text;
-
-        button.onclick = () => {
-
-            loadScene(choice.next);
-
-        };
-
-        choicesDiv.appendChild(button);
-
-    });
-
 }
