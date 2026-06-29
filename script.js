@@ -73,3 +73,61 @@ async function init() {
 
     }
 }
+
+// ==============================
+// LOAD SCENE
+// ==============================
+
+function loadScene(sceneID){
+
+    const scene = Engine.scenes[sceneID];
+
+    if(!scene){
+        console.error("Scene not found:", sceneID);
+        return;
+    }
+
+    validateScene(sceneID, scene); // <-- ADD THIS
+
+    Engine.currentScene = sceneID;
+
+    choicesDiv.innerHTML = "";
+    choicesDiv.style.display = "none";
+
+    video.src = scene.video;
+    video.play();
+
+    video.onended = () => {
+        showChoices(scene.choices);
+    };
+}
+
+// ==============================
+// SHOW CHOICES
+// ==============================
+
+function validateScene(sceneID, scene) {
+
+    if (!scene.video) {
+        console.warn("Scene missing video:", sceneID);
+    }
+
+    if (!scene.choices) {
+        console.warn("Scene missing choices:", sceneID);
+    }
+
+    if (scene.choices) {
+
+        scene.choices.forEach(choice => {
+
+            if (!Engine.scenes[choice.next]) {
+                console.error(
+                    `Broken link in ${sceneID}: "${choice.next}" does not exist`
+                );
+            }
+
+        });
+
+    }
+
+}
