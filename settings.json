@@ -1,1 +1,6 @@
-
+{
+    "showControls": true,
+    "allowFullscreen": true,
+    "defaultTransition": "none",
+    "language": "en"
+}
