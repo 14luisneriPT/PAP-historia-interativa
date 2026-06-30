@@ -1,3 +1,5 @@
+let connectMode = false;
+let connectSource = null;
 let scenes = {};
 let cy;
 let selectedScene = null;
@@ -84,12 +86,45 @@ function buildGraph() {
 
     });
 
-    cy.on("tap", "node", (evt) => {
+    ccy.on("tap", "node", (evt) => {
 
-        selectedScene = evt.target.id();
-        showProperties();
+    const id = evt.target.id();
 
-    });
+    // If we're connecting nodes
+    if (connectMode) {
+
+        if (!connectSource) {
+
+            connectSource = id;
+            alert("Now click the target scene");
+
+        } else {
+
+            const target = id;
+
+            const text = prompt("Choice text?");
+
+            if (!text) return;
+
+            scenes[connectSource].choices.push({
+                text,
+                next: target
+            });
+
+            connectMode = false;
+            connectSource = null;
+
+            rebuild();
+
+            return;
+        }
+    }
+
+    // Normal selection mode
+    selectedScene = id;
+    showProperties();
+
+});
 
 }
 
@@ -206,7 +241,21 @@ function setupToolbar() {
     };
 
     toolbar.appendChild(btn);
+const connectBtn = document.createElement("button");
+connectBtn.textContent = "🔗 Connect Scenes";
 
+connectBtn.onclick = () => {
+
+    connectMode = !connectMode;
+    connectSource = null;
+
+    alert(connectMode
+        ? "Connect mode ON: click two scenes"
+        : "Connect mode OFF");
+
+};
+
+toolbar.appendChild(connectBtn);
 }
 
 function exportScenes() {
