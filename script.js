@@ -63,6 +63,7 @@ async function init() {
     } catch (error) {
         console.error("Engine failed to start:", error);
     }
+
 }
 
 // ==============================
@@ -82,20 +83,17 @@ function loadScene(sceneID) {
 
     Engine.currentScene = sceneID;
 
-    // reset UI
     choicesDiv.innerHTML = "";
     choicesDiv.style.display = "none";
 
-    // load video
     video.src = scene.video;
     video.load();
     video.play();
 
-    // IMPORTANT: reset event to avoid stacking bugs later
-    video.onended = null;
     video.onended = () => {
         showChoices(scene.choices);
     };
+
 }
 
 // ==============================
@@ -104,8 +102,9 @@ function loadScene(sceneID) {
 
 function showChoices(choices) {
 
-    if (!choices || choices.length === 0)
+    if (!choices || choices.length === 0) {
         return;
+    }
 
     choicesDiv.innerHTML = "";
     choicesDiv.style.display = "flex";
@@ -123,10 +122,11 @@ function showChoices(choices) {
         choicesDiv.appendChild(button);
 
     });
+
 }
 
 // ==============================
-// VALIDATION (DEBUG TOOL)
+// VALIDATION
 // ==============================
 
 function validateScene(sceneID, scene) {
@@ -144,134 +144,15 @@ function validateScene(sceneID, scene) {
         scene.choices.forEach(choice => {
 
             if (!Engine.scenes[choice.next]) {
+
                 console.error(
                     `Broken link in ${sceneID}: "${choice.next}" does not exist`
                 );
+
             }
 
         });
 
     }
-const mapDiv = document.getElementById("map");
-let mapVisible = false;
-
-// Toggle map
-function toggleMap() {
-
-    mapVisible = !mapVisible;
-
-    if (mapVisible) {
-        renderMap();
-        mapDiv.style.display = "flex";
-    } else {
-        mapDiv.style.display = "none";
-    }
-
-}
-
-// Render all scenes
-function renderMap() {
-
-    mapDiv.innerHTML = "";
-
-    const scenes = Engine.scenes;
-
-    Object.keys(scenes).forEach(sceneID => {
-
-        const scene = scenes[sceneID];
-
-        const node = document.createElement("div");
-        node.className = "map-node";
-
-        node.innerHTML = `
-            <b>${sceneID}</b><br>
-            ${scene.title || ""}
-        `;
-
-        node.onclick = () => {
-            loadScene(sceneID);
-            toggleMap();
-        };
-
-        mapDiv.appendChild(node);
-
-        // draw connections
-        if (scene.choices) {
-
-            scene.choices.forEach(choice => {
-
-                const line = document.createElement("div");
-                line.className = "map-line";
-
-                line.innerText = `${sceneID} → ${choice.next}`;
-
-                mapDiv.appendChild(line);
-
-            });
-
-        }
-
-    });
-
-const mapDiv = document.getElementById("map");
-let mapVisible = false;
-
-// Toggle map
-function toggleMap() {
-
-    mapVisible = !mapVisible;
-
-    if (mapVisible) {
-        renderMap();
-        mapDiv.style.display = "flex";
-    } else {
-        mapDiv.style.display = "none";
-    }
-
-}
-
-// Render all scenes
-function renderMap() {
-
-    mapDiv.innerHTML = "";
-
-    const scenes = Engine.scenes;
-
-    Object.keys(scenes).forEach(sceneID => {
-
-        const scene = scenes[sceneID];
-
-        const node = document.createElement("div");
-        node.className = "map-node";
-
-        node.innerHTML = `
-            <b>${sceneID}</b><br>
-            ${scene.title || ""}
-        `;
-
-        node.onclick = () => {
-            loadScene(sceneID);
-            toggleMap();
-        };
-
-        mapDiv.appendChild(node);
-
-        // draw connections
-        if (scene.choices) {
-
-            scene.choices.forEach(choice => {
-
-                const line = document.createElement("div");
-                line.className = "map-line";
-
-                line.innerText = `${sceneID} → ${choice.next}`;
-
-                mapDiv.appendChild(line);
-
-            });
-
-        }
-
-    });
 
 }
