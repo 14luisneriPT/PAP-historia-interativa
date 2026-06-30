@@ -3,7 +3,7 @@ let connectSource = null;
 let scenes = {};
 let cy;
 let selectedScene = null;
-
+let sceneCounter = 0;
 init();
 
 async function init() {
@@ -274,4 +274,28 @@ function exportScenes() {
 
     URL.revokeObjectURL(url);
 
+}
+function createScene() {
+
+    sceneCounter++;
+
+    const id = "scene_" + sceneCounter;
+
+    Engine.scenes[id] = {
+        title: "New Scene",
+        video: "",
+        choices: []
+    };
+
+    addNodeToGraph(id);
+}
+document.getElementById("addSceneBtn").onclick = createScene;
+function addNodeToGraph(id) {
+
+    cy.add({
+        group: "nodes",
+        data: { id: id, label: id }
+    });
+
+    layout.run();
 }
