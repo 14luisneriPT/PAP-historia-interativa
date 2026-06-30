@@ -239,3 +239,63 @@ input{
     margin-top:10px;
 
 }
+#toolbar{
+
+    background:#222;
+    color:white;
+
+    padding:15px;
+
+}
+
+#toolbar button{
+
+    padding:10px 20px;
+
+    margin-left:20px;
+
+}
+
+#editor{
+
+    display:flex;
+
+    height:calc(100vh - 70px);
+
+}
+
+#graph{
+
+    flex:3;
+
+    border-right:2px solid #ccc;
+
+}
+
+#properties{
+
+    flex:1;
+
+    padding:20px;
+
+    overflow:auto;
+
+}
+
+#properties input{
+
+    width:100%;
+
+    padding:8px;
+
+    margin-bottom:15px;
+
+}
+
+#properties button{
+
+    width:100%;
+
+    padding:10px;
+
+}
