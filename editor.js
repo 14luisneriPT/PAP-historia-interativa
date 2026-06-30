@@ -6,11 +6,11 @@ init();
 
 async function init() {
 
-    const response = await fetch("scenes.json");
-
-    scenes = await response.json();
+    const res = await fetch("scenes.json");
+    scenes = await res.json();
 
     buildGraph();
+    setupToolbar();
 
 }
 
@@ -23,28 +23,20 @@ function buildGraph() {
         const scene = scenes[id];
 
         elements.push({
-
             data: {
-
                 id: id,
                 label: scene.title
-
             }
-
         });
 
         scene.choices.forEach(choice => {
 
             elements.push({
-
                 data: {
-
                     source: id,
                     target: choice.next,
                     label: choice.text
-
                 }
-
             });
 
         });
@@ -60,59 +52,41 @@ function buildGraph() {
         style: [
 
             {
-
                 selector: "node",
-
                 style: {
-
                     label: "data(label)",
-
                     "background-color": "#4CAF50",
-
                     color: "white",
-
                     "text-valign": "center",
-
-                    "text-halign": "center"
-
+                    "text-halign": "center",
+                    width: 80,
+                    height: 80
                 }
-
             },
 
             {
-
                 selector: "edge",
-
                 style: {
-
                     label: "data(label)",
-
-                    width: 3,
-
+                    width: 2,
                     "curve-style": "bezier",
-
-                    "target-arrow-shape": "triangle"
-
+                    "target-arrow-shape": "triangle",
+                    "font-size": 10
                 }
-
             }
 
         ],
 
         layout: {
-
             name: "breadthfirst",
-
             directed: true
-
         }
 
     });
 
-    cy.on("tap", "node", function(evt) {
+    cy.on("tap", "node", (evt) => {
 
         selectedScene = evt.target.id();
-
         showProperties();
 
     });
@@ -127,34 +101,24 @@ function showProperties() {
 
         <h2>${selectedScene}</h2>
 
-        <p>Title</p>
+        <label>Title</label>
+        <input id="titleInput" value="${scene.title}">
 
-        <input
-            id="titleInput"
-            value="${scene.title}"
-        >
+        <label>Video</label>
+        <input id="videoInput" value="${scene.video}">
 
-        <p>Video</p>
-
-        <input
-            id="videoInput"
-            value="${scene.video}"
-        >
-
-        <button onclick="saveScene()">
-            Save Changes
-        </button>
+        <button onclick="saveScene()">💾 Save</button>
+        <button onclick="addChoice()">➕ Add Choice</button>
+        <button onclick="deleteScene()">❌ Delete Scene</button>
 
         <hr>
 
         <h3>Choices</h3>
 
         <ul>
-
-            ${scene.choices.map(choice => `
-                <li>${choice.text} → ${choice.next}</li>
+            ${scene.choices.map(c => `
+                <li>${c.text} → ${c.next}</li>
             `).join("")}
-
         </ul>
 
     `;
@@ -174,33 +138,89 @@ function saveScene() {
         scenes[selectedScene].title
     );
 
-    alert("Scene updated in memory.");
+    alert("Saved (memory only)");
+
+}
+
+function addChoice() {
+
+    const text = prompt("Choice text?");
+    const next = prompt("Target scene ID?");
+
+    if (!text || !next) return;
+
+    scenes[selectedScene].choices.push({
+        text,
+        next
+    });
+
+    rebuild();
+
+}
+
+function deleteScene() {
+
+    if (!confirm("Delete this scene?")) return;
+
+    delete scenes[selectedScene];
+
+    selectedScene = null;
+
+    rebuild();
+
+}
+
+function rebuild() {
+
+    cy.destroy();
+    buildGraph();
+
+    document.getElementById("properties").innerHTML =
+        "<p>Select a scene.</p>";
+
+}
+
+function setupToolbar() {
+
+    const toolbar = document.getElementById("toolbar");
+
+    const btn = document.createElement("button");
+    btn.textContent = "➕ New Scene";
+
+    btn.onclick = () => {
+
+        const id = prompt("Scene ID? (e.g. scene_004)");
+        const title = prompt("Title?");
+        const video = prompt("Video path?");
+
+        if (!id || scenes[id]) return;
+
+        scenes[id] = {
+            title,
+            video,
+            choices: []
+        };
+
+        rebuild();
+
+    };
+
+    toolbar.appendChild(btn);
 
 }
 
 function exportScenes() {
 
-    const json = JSON.stringify(
-        scenes,
-        null,
-        4
-    );
+    const json = JSON.stringify(scenes, null, 4);
 
-    const blob = new Blob(
-        [json],
-        {
-            type: "application/json"
-        }
-    );
+    const blob = new Blob([json], { type: "application/json" });
 
     const url = URL.createObjectURL(blob);
 
     const a = document.createElement("a");
 
     a.href = url;
-
     a.download = "scenes.json";
-
     a.click();
 
     URL.revokeObjectURL(url);
