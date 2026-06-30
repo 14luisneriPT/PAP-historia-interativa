@@ -64,13 +64,9 @@ EDITOR
 
 #graph{
 
-    display:flex;
+    width:100%;
 
-    flex-wrap:wrap;
-
-    gap:20px;
-
-    padding:20px;
+    height:100vh;
 
 }
 
