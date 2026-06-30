@@ -272,7 +272,22 @@ rebuild();
     };
 
     toolbar.appendChild(btn);
+const resetBtn = document.createElement("button");
 
+resetBtn.textContent = "🗑 Reset";
+
+resetBtn.onclick = () => {
+
+    if (!confirm("Delete local save?"))
+        return;
+
+    localStorage.removeItem("storyProject");
+
+    location.reload();
+
+};
+
+toolbar.appendChild(resetBtn);
     // CONNECT MODE
     const connectBtn = document.createElement("button");
     connectBtn.textContent = "🔗 Connect";
