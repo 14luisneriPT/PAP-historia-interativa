@@ -58,3 +58,46 @@ button {
 .map-line {
     color: white;
 }
+/* ===========================
+EDITOR
+=========================== */
+
+#graph{
+
+    display:flex;
+
+    flex-wrap:wrap;
+
+    gap:20px;
+
+    padding:20px;
+
+}
+
+.node{
+
+    width:250px;
+
+    background:white;
+
+    color:black;
+
+    border-radius:10px;
+
+    padding:15px;
+
+    box-shadow:0 0 10px rgba(0,0,0,.3);
+
+}
+
+.node h3{
+
+    margin-top:0;
+
+}
+
+.node ul{
+
+    padding-left:20px;
+
+}
