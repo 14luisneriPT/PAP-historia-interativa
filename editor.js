@@ -1,52 +1,99 @@
 const graph = document.getElementById("graph");
+const properties = document.getElementById("properties");
 
 let scenes = {};
+let selectedScene = null;
 
-loadScenes();
+init();
 
-async function loadScenes(){
+async function init(){
 
     const response = await fetch("scenes.json");
 
     scenes = await response.json();
 
-    render();
+    renderGraph();
 
 }
 
-function render(){
+function renderGraph(){
 
     graph.innerHTML = "";
 
-    Object.keys(scenes).forEach(sceneID => {
+    Object.keys(scenes).forEach(sceneID=>{
 
         const scene = scenes[sceneID];
 
-        const node = document.createElement("div");
+        const card = document.createElement("div");
 
-        node.className = "node";
+        card.className = "sceneCard";
 
-        node.innerHTML = `
-            <h3>${sceneID}</h3>
-            <p>${scene.title}</p>
+        card.innerHTML = `
+            <strong>${sceneID}</strong><br>
+            ${scene.title}
         `;
 
-        const list = document.createElement("ul");
+        card.onclick=()=>{
 
-        scene.choices.forEach(choice => {
+            selectedScene=sceneID;
 
-            const li = document.createElement("li");
+            renderProperties();
 
-            li.textContent = `${choice.text} → ${choice.next}`;
+        };
 
-            list.appendChild(li);
-
-        });
-
-        node.appendChild(list);
-
-        graph.appendChild(node);
+        graph.appendChild(card);
 
     });
+
+}
+
+function renderProperties(){
+
+    const scene=scenes[selectedScene];
+
+    properties.innerHTML=`
+
+        <p><b>ID</b></p>
+        <p>${selectedScene}</p>
+
+        <p><b>Title</b></p>
+
+        <input
+            type="text"
+            value="${scene.title}"
+            disabled
+        >
+
+        <p><b>Video</b></p>
+
+        <input
+            type="text"
+            value="${scene.video}"
+            disabled
+        >
+
+        <p><b>Choices</b></p>
+
+        <ul>
+
+            ${
+                scene.choices.map(choice=>`
+
+                    <li>
+
+                        ${choice.text}
+
+                        →
+
+                        ${choice.next}
+
+                    </li>
+
+                `).join("")
+            }
+
+        </ul>
+
+    `;
 
 }
