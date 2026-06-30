@@ -1,99 +1,128 @@
-const graph = document.getElementById("graph");
-const properties = document.getElementById("properties");
-
 let scenes = {};
-let selectedScene = null;
 
 init();
 
-async function init(){
+async function init() {
 
     const response = await fetch("scenes.json");
 
     scenes = await response.json();
 
-    renderGraph();
+    createGraph();
 
 }
 
-function renderGraph(){
+function createGraph() {
 
-    graph.innerHTML = "";
+    const elements = [];
 
-    Object.keys(scenes).forEach(sceneID=>{
+    Object.keys(scenes).forEach(sceneID => {
 
         const scene = scenes[sceneID];
 
-        const card = document.createElement("div");
+        elements.push({
 
-        card.className = "sceneCard";
+            data: {
 
-        card.innerHTML = `
-            <strong>${sceneID}</strong><br>
-            ${scene.title}
-        `;
+                id: sceneID,
+                label: scene.title
 
-        card.onclick=()=>{
+            }
 
-            selectedScene=sceneID;
+        });
 
-            renderProperties();
+        scene.choices.forEach(choice => {
 
-        };
+            elements.push({
 
-        graph.appendChild(card);
+                data: {
+
+                    source: sceneID,
+                    target: choice.next,
+                    label: choice.text
+
+                }
+
+            });
+
+        });
 
     });
 
-}
+    const cy = cytoscape({
 
-function renderProperties(){
+        container: document.getElementById("graph"),
 
-    const scene=scenes[selectedScene];
+        elements: elements,
 
-    properties.innerHTML=`
+        style: [
 
-        <p><b>ID</b></p>
-        <p>${selectedScene}</p>
+            {
 
-        <p><b>Title</b></p>
+                selector: "node",
 
-        <input
-            type="text"
-            value="${scene.title}"
-            disabled
-        >
+                style: {
 
-        <p><b>Video</b></p>
+                    label: "data(label)",
 
-        <input
-            type="text"
-            value="${scene.video}"
-            disabled
-        >
+                    "text-valign": "center",
 
-        <p><b>Choices</b></p>
+                    "text-halign": "center",
 
-        <ul>
+                    "background-color": "#4CAF50",
 
-            ${
-                scene.choices.map(choice=>`
+                    color: "white",
 
-                    <li>
+                    width: 90,
 
-                        ${choice.text}
+                    height: 90,
 
-                        →
+                    "font-size": 14
 
-                        ${choice.next}
+                }
 
-                    </li>
+            },
 
-                `).join("")
+            {
+
+                selector: "edge",
+
+                style: {
+
+                    label: "data(label)",
+
+                    width: 3,
+
+                    "curve-style": "bezier",
+
+                    "target-arrow-shape": "triangle",
+
+                    "font-size": 10
+
+                }
+
             }
 
-        </ul>
+        ],
 
-    `;
+        layout: {
+
+            name: "breadthfirst",
+
+            directed: true,
+
+            spacingFactor: 1.5
+
+        }
+
+    });
+
+    cy.on("tap", "node", function(evt){
+
+        const node = evt.target;
+
+        alert(node.id());
+
+    });
 
 }
