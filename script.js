@@ -28,41 +28,24 @@ init();
 
 async function init() {
 
-    try {
+    const local = localStorage.getItem("storyProject");
 
-        console.log("Engine starting...");
+    if (local) {
 
-        const [settingsRes, storyRes, scenesRes] = await Promise.all([
-            fetch("settings.json"),
-            fetch("story.json"),
-            fetch("scenes.json")
-        ]);
+        scenes = JSON.parse(local);
+        console.log("Loaded project from local storage.");
 
-        Engine.settings = await settingsRes.json();
-        Engine.story = await storyRes.json();
-        Engine.scenes = await scenesRes.json();
+    } else {
 
-        console.log("Settings loaded:", Engine.settings);
-        console.log("Story loaded:", Engine.story);
-        console.log("Scenes loaded:", Object.keys(Engine.scenes));
+        const res = await fetch("scenes.json");
+        scenes = await res.json();
 
-        video.controls = Engine.settings.showControls;
+        console.log("Loaded project from scenes.json");
 
-        if (!Engine.story.firstScene) {
-            console.error("ERROR: firstScene missing in story.json");
-            return;
-        }
-
-        if (!Engine.scenes[Engine.story.firstScene]) {
-            console.error("ERROR: firstScene not found in scenes.json");
-            return;
-        }
-
-        loadScene(Engine.story.firstScene);
-
-    } catch (error) {
-        console.error("Engine failed to start:", error);
     }
+
+    buildGraph();
+    setupToolbar();
 
 }
 
