@@ -1,9 +1,11 @@
 let connectMode = false;
 let connectSource = null;
+
 let scenes = {};
 let cy;
 let selectedScene = null;
 let sceneCounter = 0;
+
 init();
 
 async function init() {
@@ -13,8 +15,11 @@ async function init() {
 
     buildGraph();
     setupToolbar();
-
 }
+
+// ==============================
+// GRAPH
+// ==============================
 
 function buildGraph() {
 
@@ -27,11 +32,11 @@ function buildGraph() {
         elements.push({
             data: {
                 id: id,
-                label: scene.title
+                label: scene.title || id
             }
         });
 
-        scene.choices.forEach(choice => {
+        (scene.choices || []).forEach(choice => {
 
             elements.push({
                 data: {
@@ -52,7 +57,6 @@ function buildGraph() {
         elements: elements,
 
         style: [
-
             {
                 selector: "node",
                 style: {
@@ -76,89 +80,90 @@ function buildGraph() {
                     "font-size": 10
                 }
             }
-
         ],
 
         layout: {
             name: "breadthfirst",
             directed: true
         }
-
     });
 
-    ccy.on("tap", "node", (evt) => {
+    cy.on("tap", "node", (evt) => {
 
-    const id = evt.target.id();
+        const id = evt.target.id();
 
-    // If we're connecting nodes
-    if (connectMode) {
+        // CONNECT MODE
+        if (connectMode) {
 
-        if (!connectSource) {
+            if (!connectSource) {
 
-            connectSource = id;
-            alert("Now click the target scene");
+                connectSource = id;
+                alert("Now click target scene");
 
-        } else {
+            } else {
 
-            const target = id;
+                const target = id;
+                const text = prompt("Choice text?");
 
-            const text = prompt("Choice text?");
+                if (!text) return;
 
-            if (!text) return;
+                if (!scenes[connectSource].choices) {
+                    scenes[connectSource].choices = [];
+                }
 
-            scenes[connectSource].choices.push({
-                text,
-                next: target
-            });
+                scenes[connectSource].choices.push({
+                    text,
+                    next: target
+                });
 
-            connectMode = false;
-            connectSource = null;
+                connectMode = false;
+                connectSource = null;
 
-            rebuild();
-
-            return;
+                rebuild();
+                return;
+            }
         }
-    }
 
-    // Normal selection mode
-    selectedScene = id;
-    showProperties();
-
-});
-
+        selectedScene = id;
+        showProperties();
+    });
 }
+
+// ==============================
+// PROPERTIES PANEL
+// ==============================
 
 function showProperties() {
 
     const scene = scenes[selectedScene];
 
     document.getElementById("properties").innerHTML = `
-
         <h2>${selectedScene}</h2>
 
         <label>Title</label>
-        <input id="titleInput" value="${scene.title}">
+        <input id="titleInput" value="${scene.title || ""}">
 
         <label>Video</label>
-        <input id="videoInput" value="${scene.video}">
+        <input id="videoInput" value="${scene.video || ""}">
 
         <button onclick="saveScene()">💾 Save</button>
         <button onclick="addChoice()">➕ Add Choice</button>
-        <button onclick="deleteScene()">❌ Delete Scene</button>
+        <button onclick="deleteScene()">❌ Delete</button>
 
         <hr>
 
         <h3>Choices</h3>
-
         <ul>
-            ${scene.choices.map(c => `
+            ${(scene.choices || []).map(c => `
                 <li>${c.text} → ${c.next}</li>
             `).join("")}
         </ul>
-
     `;
-
 }
+
+// ==============================
+// SAVE
+// ==============================
 
 function saveScene() {
 
@@ -168,14 +173,12 @@ function saveScene() {
     scenes[selectedScene].video =
         document.getElementById("videoInput").value;
 
-    cy.getElementById(selectedScene).data(
-        "label",
-        scenes[selectedScene].title
-    );
-
-    alert("Saved (memory only)");
-
+    rebuild();
 }
+
+// ==============================
+// ADD CHOICE
+// ==============================
 
 function addChoice() {
 
@@ -184,26 +187,35 @@ function addChoice() {
 
     if (!text || !next) return;
 
+    if (!scenes[selectedScene].choices) {
+        scenes[selectedScene].choices = [];
+    }
+
     scenes[selectedScene].choices.push({
         text,
         next
     });
 
     rebuild();
-
 }
+
+// ==============================
+// DELETE SCENE
+// ==============================
 
 function deleteScene() {
 
-    if (!confirm("Delete this scene?")) return;
+    if (!confirm("Delete scene?")) return;
 
     delete scenes[selectedScene];
-
     selectedScene = null;
 
     rebuild();
-
 }
+
+// ==============================
+// REBUILD GRAPH
+// ==============================
 
 function rebuild() {
 
@@ -212,19 +224,23 @@ function rebuild() {
 
     document.getElementById("properties").innerHTML =
         "<p>Select a scene.</p>";
-
 }
+
+// ==============================
+// TOOLBAR
+// ==============================
 
 function setupToolbar() {
 
     const toolbar = document.getElementById("toolbar");
 
+    // NEW SCENE
     const btn = document.createElement("button");
     btn.textContent = "➕ New Scene";
 
     btn.onclick = () => {
 
-        const id = prompt("Scene ID? (e.g. scene_004)");
+        const id = prompt("Scene ID?");
         const title = prompt("Title?");
         const video = prompt("Video path?");
 
@@ -237,26 +253,38 @@ function setupToolbar() {
         };
 
         rebuild();
-
     };
 
     toolbar.appendChild(btn);
-const connectBtn = document.createElement("button");
-connectBtn.textContent = "🔗 Connect Scenes";
 
-connectBtn.onclick = () => {
+    // CONNECT MODE
+    const connectBtn = document.createElement("button");
+    connectBtn.textContent = "🔗 Connect";
 
-    connectMode = !connectMode;
-    connectSource = null;
+    connectBtn.onclick = () => {
 
-    alert(connectMode
-        ? "Connect mode ON: click two scenes"
-        : "Connect mode OFF");
+        connectMode = !connectMode;
+        connectSource = null;
 
-};
+        alert(connectMode
+            ? "Connect mode ON"
+            : "Connect mode OFF");
+    };
 
-toolbar.appendChild(connectBtn);
+    toolbar.appendChild(connectBtn);
+
+    // EXPORT
+    const exportBtn = document.createElement("button");
+    exportBtn.textContent = "⬇ Export";
+
+    exportBtn.onclick = exportScenes;
+
+    toolbar.appendChild(exportBtn);
 }
+
+// ==============================
+// EXPORT
+// ==============================
 
 function exportScenes() {
 
@@ -267,35 +295,9 @@ function exportScenes() {
     const url = URL.createObjectURL(blob);
 
     const a = document.createElement("a");
-
     a.href = url;
     a.download = "scenes.json";
     a.click();
 
     URL.revokeObjectURL(url);
-
-}
-function createScene() {
-
-    sceneCounter++;
-
-    const id = "scene_" + sceneCounter;
-
-    Engine.scenes[id] = {
-        title: "New Scene",
-        video: "",
-        choices: []
-    };
-
-    addNodeToGraph(id);
-}
-document.getElementById("addSceneBtn").onclick = createScene;
-function addNodeToGraph(id) {
-
-    cy.add({
-        group: "nodes",
-        data: { id: id, label: id }
-    });
-
-    layout.run();
 }
