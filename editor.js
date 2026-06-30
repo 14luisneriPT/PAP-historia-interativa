@@ -281,7 +281,15 @@ function setupToolbar() {
 
     toolbar.appendChild(exportBtn);
 }
+function autoSave() {
 
+    localStorage.setItem(
+        "storyProject",
+        JSON.stringify(scenes)
+    );
+
+    console.log("Project auto-saved.");
+}
 // ==============================
 // EXPORT
 // ==============================
