@@ -1,8 +1,12 @@
 let scenes = {};
 
+let selectedScene = null;
+
+let cy;
+
 init();
 
-async function init() {
+async function init(){
 
     const response = await fetch("scenes.json");
 
@@ -12,35 +16,31 @@ async function init() {
 
 }
 
-function createGraph() {
+function createGraph(){
 
-    const elements = [];
+    const elements=[];
 
-    Object.keys(scenes).forEach(sceneID => {
+    Object.keys(scenes).forEach(sceneID=>{
 
-        const scene = scenes[sceneID];
+        const scene=scenes[sceneID];
 
         elements.push({
 
-            data: {
-
-                id: sceneID,
-                label: scene.title
-
+            data:{
+                id:sceneID,
+                label:scene.title
             }
 
         });
 
-        scene.choices.forEach(choice => {
+        scene.choices.forEach(choice=>{
 
             elements.push({
 
-                data: {
-
-                    source: sceneID,
-                    target: choice.next,
-                    label: choice.text
-
+                data:{
+                    source:sceneID,
+                    target:choice.next,
+                    label:choice.text
                 }
 
             });
@@ -49,35 +49,33 @@ function createGraph() {
 
     });
 
-    const cy = cytoscape({
+    cy=cytoscape({
 
-        container: document.getElementById("graph"),
+        container:document.getElementById("graph"),
 
-        elements: elements,
+        elements:elements,
 
-        style: [
+        style:[
 
             {
 
-                selector: "node",
+                selector:"node",
 
-                style: {
+                style:{
 
-                    label: "data(label)",
+                    label:"data(label)",
 
-                    "text-valign": "center",
+                    "background-color":"#4CAF50",
 
-                    "text-halign": "center",
+                    color:"white",
 
-                    "background-color": "#4CAF50",
+                    "text-valign":"center",
 
-                    color: "white",
+                    "text-halign":"center",
 
-                    width: 90,
+                    width:80,
 
-                    height: 90,
-
-                    "font-size": 14
+                    height:80
 
                 }
 
@@ -85,19 +83,17 @@ function createGraph() {
 
             {
 
-                selector: "edge",
+                selector:"edge",
 
-                style: {
+                style:{
 
-                    label: "data(label)",
+                    label:"data(label)",
 
-                    width: 3,
+                    width:3,
 
-                    "curve-style": "bezier",
+                    "curve-style":"bezier",
 
-                    "target-arrow-shape": "triangle",
-
-                    "font-size": 10
+                    "target-arrow-shape":"triangle"
 
                 }
 
@@ -105,24 +101,93 @@ function createGraph() {
 
         ],
 
-        layout: {
+        layout:{
 
-            name: "breadthfirst",
+            name:"breadthfirst",
 
-            directed: true,
+            directed:true,
 
-            spacingFactor: 1.5
+            spacingFactor:1.6
 
         }
 
     });
 
-    cy.on("tap", "node", function(evt){
+    cy.on("tap","node",function(evt){
 
-        const node = evt.target;
+        selectedScene=evt.target.id();
 
-        alert(node.id());
+        updateProperties();
 
     });
+
+}
+
+function updateProperties(){
+
+    const scene=scenes[selectedScene];
+
+    const panel=document.getElementById("properties");
+
+    let choicesHTML="";
+
+    scene.choices.forEach(choice=>{
+
+        choicesHTML+=`
+            <li>${choice.text} → ${choice.next}</li>
+        `;
+
+    });
+
+    panel.innerHTML=`
+
+        <h2>${selectedScene}</h2>
+
+        <label>Title</label>
+
+        <input
+            id="titleInput"
+            value="${scene.title}"
+        >
+
+        <label>Video</label>
+
+        <input
+            id="videoInput"
+            value="${scene.video}"
+        >
+
+        <h3>Choices</h3>
+
+        <ul>
+
+            ${choicesHTML}
+
+        </ul>
+
+        <button onclick="saveScene()">
+
+            Save
+
+        </button>
+
+    `;
+
+}
+
+function saveScene(){
+
+    scenes[selectedScene].title=
+        document.getElementById("titleInput").value;
+
+    scenes[selectedScene].video=
+        document.getElementById("videoInput").value;
+
+    cy.getElementById(selectedScene).data(
+        "label",
+        scenes[selectedScene].title
+    );
+
+    alert("Saved in memory.\n\nThe next step will export it to scenes.json.");
 
 }
