@@ -10,11 +10,22 @@ init();
 
 async function init() {
 
-    const res = await fetch("scenes.json");
-    scenes = await res.json();
+    const saved = localStorage.getItem("storyProject");
+
+    if (saved) {
+
+        scenes = JSON.parse(saved);
+
+    } else {
+
+        const res = await fetch("scenes.json");
+        scenes = await res.json();
+
+    }
 
     buildGraph();
     setupToolbar();
+
 }
 
 // ==============================
@@ -119,8 +130,9 @@ function buildGraph() {
                 connectMode = false;
                 connectSource = null;
 
-                rebuild();
-                return;
+                autoSave();
+rebuild();
+return;
             }
         }
 
@@ -173,7 +185,8 @@ function saveScene() {
     scenes[selectedScene].video =
         document.getElementById("videoInput").value;
 
-    rebuild();
+    autoSave();
+rebuild();
 }
 
 // ==============================
@@ -196,7 +209,8 @@ function addChoice() {
         next
     });
 
-    rebuild();
+    autoSave();
+rebuild();
 }
 
 // ==============================
@@ -210,7 +224,8 @@ function deleteScene() {
     delete scenes[selectedScene];
     selectedScene = null;
 
-    rebuild();
+    autoSave();
+rebuild();
 }
 
 // ==============================
@@ -252,7 +267,8 @@ function setupToolbar() {
             choices: []
         };
 
-        rebuild();
+        autoSave();
+rebuild();
     };
 
     toolbar.appendChild(btn);
