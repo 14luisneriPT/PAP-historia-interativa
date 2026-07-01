@@ -102,87 +102,51 @@ EDITOR
 ========================== */
 
 body{
-
     margin:0;
-
-    font-family:Arial;
-
+    background:#111;
+    color:white;
+    font-family:Arial, Helvetica, sans-serif;
 }
 
 #toolbar{
-
     background:#222;
-
-    padding:15px;
-
+    padding:20px;
 }
 
 #toolbar button{
-
     margin-right:10px;
-
     padding:10px 20px;
-
+    font-size:16px;
 }
 
 #editor{
-
     display:flex;
-
-    height:calc(100vh - 60px);
-
+    height:calc(100vh - 110px);
 }
 
-#graphPanel{
-
-    width:40%;
-
-    background:#f2f2f2;
-
-    overflow:auto;
-
-    padding:20px;
-
+#graph{
+    flex:4;
+    background:#111;
 }
 
-#propertiesPanel{
-
+#properties{
     flex:1;
-
-    padding:20px;
-
-    overflow:auto;
-
-}
-
-.sceneCard{
-
     background:white;
-
-    padding:15px;
-
-    margin-bottom:15px;
-
-    border-radius:8px;
-
-    cursor:pointer;
-
-    border:2px solid transparent;
-
+    color:black;
+    padding:20px;
+    overflow:auto;
 }
 
-.sceneCard:hover{
-
-    border-color:#4CAF50;
-
-}
-
-input{
-
+#properties input{
     width:100%;
-
+    margin-bottom:10px;
     padding:8px;
+}
 
+#properties button{
+    width:100%;
+    margin-top:10px;
+    padding:10px;
 }
 /* ========================= */
 /* STORY EDITOR */
