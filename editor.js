@@ -148,11 +148,9 @@ function buildGraph() {
         ],
 
         layout:{
-    name:"cose",
-    animate:true
-}
+            name:"cose",
+            animate:true,
             padding: 40
-
         }
 
     });
@@ -203,6 +201,7 @@ function buildGraph() {
     });
 
 }
+
 function showProperties() {
 
     if (!selectedScene)
@@ -348,6 +347,7 @@ function deleteScene(){
     rebuild();
 
 }
+
 function setupToolbar() {
 
     const addSceneBtn = document.getElementById("addSceneBtn");
@@ -421,7 +421,8 @@ function setupToolbar() {
 
     const exportBtn = document.createElement("button");
 
-    exportBtn.textContent = "⬇ Export";
+    // Removed emoji here
+    exportBtn.textContent = " Export";
 
     exportBtn.onclick = exportScenes;
 
@@ -459,6 +460,7 @@ function setupToolbar() {
     toolbar.appendChild(resetBtn);
 
 }
+
 function exportScenes() {
 
     const json = JSON.stringify(scenes, null, 4);
@@ -487,7 +489,7 @@ function exportScenes() {
 
 function importScenes(event) {
 
-    const file = event.target.files[0];
+    const file = event.target.files;
 
     if (!file)
         return;
