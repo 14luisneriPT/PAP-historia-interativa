@@ -28,7 +28,6 @@ async function init() {
         }
     }
 
-    // Calculate max scene number
     Object.keys(scenes).forEach(id => {
         if (id.startsWith("scene_")) {
             const n = parseInt(id.replace("scene_", ""));
@@ -62,7 +61,6 @@ function buildGraph() {
     Object.keys(scenes).forEach(id => {
         const scene = scenes[id];
         
-        // Push Node
         elements.push({
             data: {
                 id: id,
@@ -70,7 +68,6 @@ function buildGraph() {
             }
         });
 
-        // Push Edges
         (scene.choices || []).forEach(choice => {
             if (scenes[choice.next]) {
                 elements.push({
@@ -119,26 +116,18 @@ function buildGraph() {
         layout: {
             name: "cose",
             animate: true,
-            // Removed 'fit' from here to avoid conflicts
             padding: 40
         }
     });
 
-    // CRITICAL FIX: Wait for ready event before resizing
     cy.ready(function() {
         cy.resize();
         cy.fit();
         cy.center();
         
-        // If elements are empty, still center the view
         if (elements.length === 0) {
             cy.center();
         }
-    });
-
-    // Add error handler to console
-    cy.onerror(function(e) {
-        console.error("Cytoscape Error:", e);
     });
 
     cy.on("tap", "node", function(evt){
@@ -256,33 +245,34 @@ function deleteScene() {
 }
 
 function setupToolbar() {
-    const addSceneBtn = document.getElementById("addSceneBtn");
-
-    if (addSceneBtn) {
-        addSceneBtn.onclick = function () {
-            sceneCounter++;
-            let id = "scene_" + sceneCounter;
-
-            while (scenes[id]) {
-                sceneCounter++;
-                id = "scene_" + sceneCounter;
-            }
-
-            scenes[id] = {
-                title: "New Scene",
-                video: "",
-                choices: []
-            };
-
-            selectedScene = id;
-            autoSave();
-            rebuild();
-            showProperties();
-        };
-    }
-
     const toolbar = document.getElementById("toolbar");
     if (!toolbar) return;
+
+    toolbar.innerHTML = "";
+
+    const addSceneBtn = document.createElement("button");
+    addSceneBtn.textContent = "New Scene";
+    addSceneBtn.onclick = function () {
+        sceneCounter++;
+        let id = "scene_" + sceneCounter;
+
+        while (scenes[id]) {
+            sceneCounter++;
+            id = "scene_" + sceneCounter;
+        }
+
+        scenes[id] = {
+            title: "New Scene",
+            video: "",
+            choices: []
+        };
+
+        selectedScene = id;
+        autoSave();
+        rebuild();
+        showProperties();
+    };
+    toolbar.appendChild(addSceneBtn);
 
     const connectBtn = document.createElement("button");
     connectBtn.textContent = " Connect";
@@ -290,8 +280,10 @@ function setupToolbar() {
         connectMode = !connectMode;
         connectSource = null;
         if (connectMode) {
+            connectBtn.style.background = "#4CAF50";
             alert("Click the first scene, then the destination scene.");
         } else {
+            connectBtn.style.background = "";
             alert("Connect mode disabled.");
         }
     };
@@ -346,7 +338,7 @@ function exportScenes() {
 }
 
 function importScenes(event) {
-    const file = event.target.files; // FIXED: Access the first file from the list
+    const file = event.target.files;
     if (!file) return;
 
     const reader = new FileReader();
