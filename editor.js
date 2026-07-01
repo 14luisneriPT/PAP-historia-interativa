@@ -147,13 +147,20 @@ function buildGraph() {
 
         ],
 
-        layout:{
-            name:"cose",
-            animate:true,
-            padding: 40
+        layout: {
+            name: "cose",
+            animate: true,
+            fit: true
         }
 
     });
+
+    // Force graph to appear correctly after initialization
+    setTimeout(() => {
+        cy.resize();
+        cy.fit();
+        cy.center();
+    }, 100);
 
     cy.on("tap", "node", function(evt){
 
@@ -421,7 +428,6 @@ function setupToolbar() {
 
     const exportBtn = document.createElement("button");
 
-    // Removed emoji here
     exportBtn.textContent = " Export";
 
     exportBtn.onclick = exportScenes;
