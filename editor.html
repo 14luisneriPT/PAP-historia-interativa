@@ -10,24 +10,20 @@
 <body>
 
 <div id="toolbar">
-    <button id="addSceneBtn">New Scene</button>
-    <button id="connectBtn">Connect</button>
-    <button id="saveBtn">Save</button>
-    <button onclick="exportScenes()">Export</button>
-    <button id="importBtn">Import</button>
-    <button id="resetBtn">Reset Save</button>
-    <input type="file" id="importFile" accept=".json" style="display:none;">
+    <!-- Buttons will be injected here by JS -->
 </div>
+<input type="file" id="importFile" accept=".json" style="display:none;">
 
 <div id="editor">
     <div id="graph"></div>
     <div id="properties">
         <h2>Select a scene</h2>
-        <p>Click a node to edit it.</p>
+        <p>Click any node to edit.</p>
     </div>
 </div>
 
 <script src="https://unpkg.com/cytoscape/dist/cytoscape.min.js"></script>
+<script src="https://unpkg.com/cytoscape-cose-bilkent/cytoscape-cose-bilkent.js"></script>
 <script src="editor.js"></script>
 
 </body>
