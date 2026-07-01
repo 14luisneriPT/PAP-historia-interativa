@@ -2,38 +2,25 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
     <title>Story Editor</title>
-
     <link rel="stylesheet" href="style.css">
-
 </head>
 
 <body>
 
 <div id="toolbar">
 
-    <h1>🎬 Interactive Story Editor</h1>
+    <h1>Interactive Story Editor</h1>
 
-    <button id="newSceneBtn">➕ New Scene</button>
+    <button id="newSceneBtn">New Scene</button>
+    <button id="connectBtn">Connect</button>
+    <button id="saveBtn">Save</button>
+    <button onclick="exportScenes()">Export</button>
+    <button id="importBtn">Import</button>
+    <button id="resetBtn">Reset Save</button>
 
-    <button id="connectBtn">🔗 Connect</button>
-
-    <button id="saveBtn">💾 Save</button>
-
-    <button onclick="exportScenes()">⬇ Export</button>
-
-    <button id="importBtn">📂 Import</button>
-
-    <button id="resetBtn">🗑 Reset Save</button>
-
-    <input
-        type="file"
-        id="importFile"
-        accept=".json"
-        style="display:none;"
-    >
+    <input type="file" id="importFile" accept=".json" style="display:none;">
 
 </div>
 
@@ -42,29 +29,13 @@
     <div id="graph"></div>
 
     <div id="properties">
-
-<div id="editor">
-
-    <div id="graph"></div>
-
-    <div id="properties">
-
         <h2>Select a scene</h2>
-
-        <p>Click any node.</p>
-
+        <p>Click a node to edit it.</p>
     </div>
 
 </div>
 
-<input
-    type="file"
-    id="importFile"
-    accept=".json"
-    style="display:none;">
-
 <script src="https://unpkg.com/cytoscape/dist/cytoscape.min.js"></script>
-
 <script src="editor.js"></script>
 
 </body>
