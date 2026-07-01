@@ -74,11 +74,14 @@ button{
 #editor{
     display:flex;
     height:calc(100vh - 80px);
+    width: 100%; /* Added to ensure full width */
 }
 
 #graph{
     flex:4;
     background:#111;
+    width: 100%;  /* Added */
+    height: 100%; /* Added - CRITICAL for Cytoscape to render */
 }
 
 #properties{
