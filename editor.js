@@ -1,9 +1,9 @@
+let scenes = {};
+let cy = null;
+let selectedScene = null;
+
 let connectMode = false;
 let connectSource = null;
-
-let scenes = {};
-let cy;
-let selectedScene = null;
 let sceneCounter = 0;
 
 init();
@@ -16,25 +16,51 @@ async function init() {
 
         scenes = JSON.parse(saved);
 
-        console.log("Loaded project from local storage.");
-
     } else {
 
         const res = await fetch("scenes.json");
         scenes = await res.json();
 
-        console.log("Loaded project from scenes.json.");
-
     }
 
-    buildGraph();
+    Object.keys(scenes).forEach(id => {
+
+        if (id.startsWith("scene_")) {
+
+            const n = parseInt(id.replace("scene_", ""));
+
+            if (!isNaN(n) && n > sceneCounter)
+                sceneCounter = n;
+
+        }
+
+    });
+
     setupToolbar();
+    buildGraph();
 
 }
 
-// ==============================
-// GRAPH
-// ==============================
+function autoSave() {
+
+    localStorage.setItem(
+        "storyProject",
+        JSON.stringify(scenes)
+    );
+
+}
+
+function rebuild() {
+
+    if (cy)
+        cy.destroy();
+
+    buildGraph();
+
+    document.getElementById("properties").innerHTML =
+        "<h2>Select a scene</h2><p>Click any node.</p>";
+
+}
 
 function buildGraph() {
 
@@ -45,20 +71,31 @@ function buildGraph() {
         const scene = scenes[id];
 
         elements.push({
+
             data: {
+
                 id: id,
                 label: scene.title || id
+
             }
+
         });
 
         (scene.choices || []).forEach(choice => {
 
+            if (!scenes[choice.next])
+                return;
+
             elements.push({
+
                 data: {
+
                     source: id,
                     target: choice.next,
                     label: choice.text
+
                 }
+
             });
 
         });
@@ -69,91 +106,112 @@ function buildGraph() {
 
         container: document.getElementById("graph"),
 
-        elements: elements,
+        elements,
 
         style: [
+
             {
+
                 selector: "node",
+
                 style: {
+
                     label: "data(label)",
                     "background-color": "#4CAF50",
                     color: "white",
+                    width: 90,
+                    height: 90,
+                    "text-wrap": "wrap",
+                    "text-max-width": 80,
                     "text-valign": "center",
-                    "text-halign": "center",
-                    width: 80,
-                    height: 80
+                    "text-halign": "center"
+
                 }
+
             },
 
             {
+
                 selector: "edge",
+
                 style: {
+
                     label: "data(label)",
                     width: 2,
                     "curve-style": "bezier",
-                    "target-arrow-shape": "triangle",
-                    "font-size": 10
+                    "target-arrow-shape": "triangle"
+
                 }
+
             }
+
         ],
 
         layout: {
+
             name: "breadthfirst",
-            directed: true
+            directed: true,
+            padding: 40
+
         }
+
     });
 
-    cy.on("tap", "node", (evt) => {
+    cy.on("tap", "node", function(evt){
 
         const id = evt.target.id();
 
-        // CONNECT MODE
-        if (connectMode) {
+        if(connectMode){
 
-            if (!connectSource) {
+            if(connectSource === null){
 
                 connectSource = id;
-                alert("Now click target scene");
 
-            } else {
+                alert("Now click the destination scene.");
 
-                const target = id;
-                const text = prompt("Choice text?");
+                return;
 
-                if (!text) return;
+            }
 
-                if (!scenes[connectSource].choices) {
-                    scenes[connectSource].choices = [];
-                }
+            const text = prompt("Choice text:");
+
+            if(text){
 
                 scenes[connectSource].choices.push({
-                    text,
-                    next: target
+
+                    text: text,
+                    next: id
+
                 });
 
-                connectMode = false;
-                connectSource = null;
-
                 autoSave();
-rebuild();
-return;
+                rebuild();
+
             }
+
+            connectSource = null;
+            connectMode = false;
+
+            return;
+
         }
 
         selectedScene = id;
+
         showProperties();
+
     });
+
 }
-
-// ==============================
-// PROPERTIES PANEL
-// ==============================
-
 function showProperties() {
+
+    if (!selectedScene)
+        return;
 
     const scene = scenes[selectedScene];
 
     document.getElementById("properties").innerHTML = `
+
         <h2>${selectedScene}</h2>
 
         <label>Title</label>
@@ -162,26 +220,46 @@ function showProperties() {
         <label>Video</label>
         <input id="videoInput" value="${scene.video || ""}">
 
+        <br><br>
+
         <button onclick="saveScene()">💾 Save</button>
+
         <button onclick="addChoice()">➕ Add Choice</button>
-        <button onclick="deleteScene()">❌ Delete</button>
+
+        <button onclick="deleteScene()">❌ Delete Scene</button>
 
         <hr>
 
         <h3>Choices</h3>
+
         <ul>
-            ${(scene.choices || []).map(c => `
-                <li>${c.text} → ${c.next}</li>
+
+            ${(scene.choices || []).map((choice,index)=>`
+
+                <li>
+
+                    ${choice.text} → ${choice.next}
+
+                    <button onclick="deleteChoice(${index})">
+
+                        ❌
+
+                    </button>
+
+                </li>
+
             `).join("")}
+
         </ul>
+
     `;
+
 }
 
-// ==============================
-// SAVE
-// ==============================
+function saveScene(){
 
-function saveScene() {
+    if(!selectedScene)
+        return;
 
     scenes[selectedScene].title =
         document.getElementById("titleInput").value;
@@ -190,157 +268,281 @@ function saveScene() {
         document.getElementById("videoInput").value;
 
     autoSave();
-rebuild();
+
+    rebuild();
+
 }
 
-// ==============================
-// ADD CHOICE
-// ==============================
+function addChoice(){
 
-function addChoice() {
+    if(!selectedScene)
+        return;
 
-    const text = prompt("Choice text?");
-    const next = prompt("Target scene ID?");
+    const text = prompt("Choice text:");
 
-    if (!text || !next) return;
+    if(text === null)
+        return;
 
-    if (!scenes[selectedScene].choices) {
-        scenes[selectedScene].choices = [];
+    const target = prompt("Destination Scene ID:");
+
+    if(target === null)
+        return;
+
+    if(!scenes[target]){
+
+        alert("That scene doesn't exist.");
+
+        return;
+
     }
 
     scenes[selectedScene].choices.push({
-        text,
-        next
+
+        text:text,
+        next:target
+
     });
 
     autoSave();
-rebuild();
+
+    rebuild();
+
 }
 
-// ==============================
-// DELETE SCENE
-// ==============================
+function deleteChoice(index){
 
-function deleteScene() {
+    if(!selectedScene)
+        return;
 
-    if (!confirm("Delete scene?")) return;
+    scenes[selectedScene].choices.splice(index,1);
+
+    autoSave();
+
+    rebuild();
+
+    selectedScene = null;
+
+}
+
+function deleteScene(){
+
+    if(!selectedScene)
+        return;
+
+    if(!confirm("Delete this scene?"))
+        return;
 
     delete scenes[selectedScene];
+
+    Object.values(scenes).forEach(scene=>{
+
+        scene.choices =
+            (scene.choices || []).filter(choice=>choice.next!==selectedScene);
+
+    });
+
     selectedScene = null;
 
     autoSave();
-rebuild();
+
+    rebuild();
+
 }
-
-// ==============================
-// REBUILD GRAPH
-// ==============================
-
-function rebuild() {
-
-    cy.destroy();
-    buildGraph();
-
-    document.getElementById("properties").innerHTML =
-        "<p>Select a scene.</p>";
-}
-
-// ==============================
-// TOOLBAR
-// ==============================
-
 function setupToolbar() {
+
+    const addSceneBtn = document.getElementById("addSceneBtn");
+
+    addSceneBtn.onclick = function () {
+
+        sceneCounter++;
+
+        let id = "scene_" + sceneCounter;
+
+        while (scenes[id]) {
+
+            sceneCounter++;
+            id = "scene_" + sceneCounter;
+
+        }
+
+        scenes[id] = {
+
+            title: "New Scene",
+            video: "",
+            choices: []
+
+        };
+
+        selectedScene = id;
+
+        autoSave();
+
+        rebuild();
+
+        selectedScene = id;
+
+        showProperties();
+
+    };
 
     const toolbar = document.getElementById("toolbar");
 
-    // NEW SCENE
-    const btn = document.createElement("button");
-    btn.textContent = "➕ New Scene";
-
-    btn.onclick = () => {
-
-        const id = prompt("Scene ID?");
-        const title = prompt("Title?");
-        const video = prompt("Video path?");
-
-        if (!id || scenes[id]) return;
-
-        scenes[id] = {
-            title,
-            video,
-            choices: []
-        };
-
-        autoSave();
-rebuild();
-    };
-
-    toolbar.appendChild(btn);
-const resetBtn = document.createElement("button");
-
-resetBtn.textContent = "🗑 Reset";
-
-resetBtn.onclick = () => {
-
-    if (!confirm("Delete local save?"))
-        return;
-
-    localStorage.removeItem("storyProject");
-
-    location.reload();
-
-};
-
-toolbar.appendChild(resetBtn);
-    // CONNECT MODE
     const connectBtn = document.createElement("button");
+
     connectBtn.textContent = "🔗 Connect";
 
-    connectBtn.onclick = () => {
+    connectBtn.onclick = function () {
 
         connectMode = !connectMode;
         connectSource = null;
 
-        alert(connectMode
-            ? "Connect mode ON"
-            : "Connect mode OFF");
+        if (connectMode)
+            alert("Click the first scene, then the destination scene.");
+        else
+            alert("Connect mode disabled.");
+
     };
 
     toolbar.appendChild(connectBtn);
 
-    // EXPORT
+    const saveBtn = document.createElement("button");
+
+    saveBtn.textContent = "💾 Save";
+
+    saveBtn.onclick = function () {
+
+        autoSave();
+
+        alert("Project saved.");
+
+    };
+
+    toolbar.appendChild(saveBtn);
+
     const exportBtn = document.createElement("button");
+
     exportBtn.textContent = "⬇ Export";
 
     exportBtn.onclick = exportScenes;
 
     toolbar.appendChild(exportBtn);
+
+    const importBtn = document.createElement("button");
+
+    importBtn.textContent = "📂 Import";
+
+    importBtn.onclick = function () {
+
+        document.getElementById("importFile").click();
+
+    };
+
+    toolbar.appendChild(importBtn);
+
+    document.getElementById("importFile").addEventListener("change", importScenes);
+
+    const resetBtn = document.createElement("button");
+
+    resetBtn.textContent = "🗑 Reset";
+
+    resetBtn.onclick = function () {
+
+        if (!confirm("Delete local save?"))
+            return;
+
+        localStorage.removeItem("storyProject");
+
+        location.reload();
+
+    };
+
+    toolbar.appendChild(resetBtn);
+
 }
-function autoSave() {
-
-    localStorage.setItem(
-        "storyProject",
-        JSON.stringify(scenes)
-    );
-
-    console.log("Project auto-saved.");
-}
-// ==============================
-// EXPORT
-// ==============================
-
 function exportScenes() {
 
     const json = JSON.stringify(scenes, null, 4);
 
-    const blob = new Blob([json], { type: "application/json" });
+    const blob = new Blob(
+        [json],
+        { type: "application/json" }
+    );
 
     const url = URL.createObjectURL(blob);
 
     const a = document.createElement("a");
+
     a.href = url;
     a.download = "scenes.json";
+
+    document.body.appendChild(a);
+
     a.click();
 
+    document.body.removeChild(a);
+
     URL.revokeObjectURL(url);
+
 }
+
+function importScenes(event) {
+
+    const file = event.target.files[0];
+
+    if (!file)
+        return;
+
+    const reader = new FileReader();
+
+    reader.onload = function(e) {
+
+        try {
+
+            const imported = JSON.parse(e.target.result);
+
+            scenes = imported;
+
+            sceneCounter = 0;
+
+            Object.keys(scenes).forEach(id => {
+
+                if (id.startsWith("scene_")) {
+
+                    const number = parseInt(id.replace("scene_", ""));
+
+                    if (!isNaN(number) && number > sceneCounter)
+                        sceneCounter = number;
+
+                }
+
+            });
+
+            selectedScene = null;
+
+            autoSave();
+
+            rebuild();
+
+            alert("Project imported successfully.");
+
+        }
+
+        catch(err) {
+
+            alert("Invalid JSON file.");
+
+            console.error(err);
+
+        }
+
+    };
+
+    reader.readAsText(file);
+
+}
+
+window.addEventListener("beforeunload", function () {
+
+    autoSave();
+
+});
