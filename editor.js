@@ -16,10 +16,14 @@ async function init() {
 
         scenes = JSON.parse(saved);
 
+        console.log("Loaded project from local storage.");
+
     } else {
 
         const res = await fetch("scenes.json");
         scenes = await res.json();
+
+        console.log("Loaded project from scenes.json.");
 
     }
 
