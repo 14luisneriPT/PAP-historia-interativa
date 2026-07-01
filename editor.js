@@ -222,11 +222,11 @@ function showProperties() {
 
         <br><br>
 
-        <button onclick="saveScene()">💾 Save</button>
+        <button onclick="saveScene()"> Save</button>
 
-        <button onclick="addChoice()">➕ Add Choice</button>
+        <button onclick="addChoice()"> Add Choice</button>
 
-        <button onclick="deleteScene()">❌ Delete Scene</button>
+        <button onclick="deleteScene()"> Delete Scene</button>
 
         <hr>
 
@@ -242,7 +242,7 @@ function showProperties() {
 
                     <button onclick="deleteChoice(${index})">
 
-                        ❌
+                        
 
                     </button>
 
@@ -389,7 +389,7 @@ function setupToolbar() {
 
     const connectBtn = document.createElement("button");
 
-    connectBtn.textContent = "🔗 Connect";
+    connectBtn.textContent = " Connect";
 
     connectBtn.onclick = function () {
 
@@ -407,7 +407,7 @@ function setupToolbar() {
 
     const saveBtn = document.createElement("button");
 
-    saveBtn.textContent = "💾 Save";
+    saveBtn.textContent = " Save";
 
     saveBtn.onclick = function () {
 
@@ -429,7 +429,7 @@ function setupToolbar() {
 
     const importBtn = document.createElement("button");
 
-    importBtn.textContent = "📂 Import";
+    importBtn.textContent = " Import";
 
     importBtn.onclick = function () {
 
@@ -443,7 +443,7 @@ function setupToolbar() {
 
     const resetBtn = document.createElement("button");
 
-    resetBtn.textContent = "🗑 Reset";
+    resetBtn.textContent = " Reset";
 
     resetBtn.onclick = function () {
 
