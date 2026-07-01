@@ -13,13 +13,11 @@
             }
         ]
     },
-
     "scene_002": {
         "title": "Left Path",
         "video": "videos/left.mp4",
         "choices": []
     },
-
     "scene_003": {
         "title": "Right Path",
         "video": "videos/right.mp4",
