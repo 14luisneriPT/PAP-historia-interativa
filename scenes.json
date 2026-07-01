@@ -41,21 +41,17 @@
     "title": "DieLightsaber",
     "video": "videos/dieLightsaber.mp4",
     "choices": []
-  }
-}
- },
-},
+  },
   "scene_005": {
     "title": "Lightsaber Fight",
     "video": "videos/lightsaber.mp4",
     "choices": [
       {
-        "text": "keep going",
+        "text": "Keep going",
         "next": "scene_006"
-      },
+      }
     ]
   },
-},
   "scene_006": {
     "title": "Final Boss Fight",
     "video": "videos/final.mp4",
@@ -65,7 +61,7 @@
         "next": "scene_007"
       },
       {
-        "text": "Atack",
+        "text": "Attack",
         "next": "scene_009"
       }
     ]
@@ -79,31 +75,24 @@
         "next": "scene_010"
       },
       {
-        "text": "Atack",
+        "text": "Attack",
         "next": "scene_008"
       }
     ]
   },
   "scene_008": {
-    "title": "Atack after dodge you win",
+    "title": "Attack after dodge - You Win",
     "video": "videos/2atack.mp4",
     "choices": []
-  }
-}
- },
-},
+  },
   "scene_009": {
-    "title": "Atack first you die",
+    "title": "Attack first - You Die",
     "video": "videos/1atack.mp4",
     "choices": []
-  }
-}
- },
-},
+  },
   "scene_010": {
-    "title": "dodge twice you die",
+    "title": "Dodge twice - You Die",
     "video": "videos/2dodge.mp4",
     "choices": []
   }
 }
- },
