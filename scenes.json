@@ -1,26 +1,45 @@
 {
-    "scene_001": {
-        "title": "Introduction",
-        "video": "videos/intro.mp4",
-        "choices": [
-            {
-                "text": "Go left",
-                "next": "scene_002"
-            },
-            {
-                "text": "Go right",
-                "next": "scene_003"
-            }
-        ]
-    },
-    "scene_002": {
-        "title": "Left Path",
-        "video": "videos/left.mp4",
-        "choices": []
-    },
-    "scene_003": {
-        "title": "Right Path",
-        "video": "videos/right.mp4",
-        "choices": []
-    }
+  "scene_001": {
+    "title": "Introduction",
+    "video": "videos/intro.mp4",
+    "choices": [
+      {
+        "text": "Pick Sword",
+        "next": "scene_002"
+      },
+      {
+        "text": "Pick LightSaber",
+        "next": "scene_003"
+      }
+    ]
+  },
+  "scene_002": {
+    "title": "Sword",
+    "video": "videos/left.mp4",
+    "choices": [
+      {
+        "text": "Keep going",
+        "next": "scene_006"
+      }
+    ]
+  },
+  "scene_003": {
+    "title": "LightSaber",
+    "video": "videos/right.mp4",
+    "choices": [
+      {
+        "text": "Stay in place",
+        "next": "scene_004"
+      },
+      {
+        "text": "Move to highground",
+        "next": "scene_005"
+      }
+    ]
+  },
+  "scene_004": {
+    "title": "DieLightsaber",
+    "video": "videos/DieLightsaber.mp4",
+    "choices": []
+  }
 }
