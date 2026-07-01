@@ -1,3 +1,6 @@
+// ==============================
+// ENGINE CORE
+// ==============================
 
 const Engine = {
     settings: {},
@@ -6,10 +9,22 @@ const Engine = {
     currentScene: null
 };
 
+// ==============================
+// DOM ELEMENTS
+// ==============================
+
 const video = document.getElementById("videoPlayer");
 const choicesDiv = document.getElementById("choices");
 
+// ==============================
+// START ENGINE
+// ==============================
+
 init();
+
+// ==============================
+// INIT
+// ==============================
 
 async function init() {
 
@@ -34,6 +49,10 @@ async function init() {
     setupToolbar();
 
 }
+
+// ==============================
+// LOAD SCENE
+// ==============================
 
 function loadScene(sceneID) {
 
@@ -60,19 +79,10 @@ function loadScene(sceneID) {
     };
 
 }
-function saveScene() {
 
-    scenes[selectedScene].title =
-        document.getElementById("titleInput").value;
-
-    scenes[selectedScene].video =
-        document.getElementById("videoInput").value;
-
-    autoSave();
-
-    rebuild();
-
-}
+// ==============================
+// SHOW CHOICES
+// ==============================
 
 function showChoices(choices) {
 
@@ -98,6 +108,10 @@ function showChoices(choices) {
     });
 
 }
+
+// ==============================
+// VALIDATION
+// ==============================
 
 function validateScene(sceneID, scene) {
 
