@@ -79,7 +79,19 @@ function loadScene(sceneID) {
     };
 
 }
+function saveScene() {
 
+    scenes[selectedScene].title =
+        document.getElementById("titleInput").value;
+
+    scenes[selectedScene].video =
+        document.getElementById("videoInput").value;
+
+    autoSave();
+
+    rebuild();
+
+}
 // ==============================
 // SHOW CHOICES
 // ==============================
