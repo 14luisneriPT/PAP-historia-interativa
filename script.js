@@ -28,12 +28,13 @@ init();
 
 async function init() {
 
-    const local = localStorage.getItem("storyProject");
+    const saved = localStorage.getItem("storyProject");
 
-    if (local) {
+    if (saved) {
 
-        scenes = JSON.parse(local);
-        console.log("Loaded project from local storage.");
+        scenes = JSON.parse(saved);
+
+        console.log("Loaded project from Local Storage");
 
     } else {
 
