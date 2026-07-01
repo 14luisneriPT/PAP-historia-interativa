@@ -15,7 +15,7 @@
   },
   "scene_002": {
     "title": "Sword",
-    "video": "videos/left.mp4",
+    "video": "videos/minecraft.mp4",
     "choices": [
       {
         "text": "Keep going",
@@ -25,7 +25,7 @@
   },
   "scene_003": {
     "title": "LightSaber",
-    "video": "videos/right.mp4",
+    "video": "videos/lightsaber.mp4",
     "choices": [
       {
         "text": "Stay in place",
@@ -39,7 +39,71 @@
   },
   "scene_004": {
     "title": "DieLightsaber",
-    "video": "videos/DieLightsaber.mp4",
+    "video": "videos/dieLightsaber.mp4",
     "choices": []
   }
 }
+ },
+},
+  "scene_005": {
+    "title": "Lightsaber Fight",
+    "video": "videos/lightsaber.mp4",
+    "choices": [
+      {
+        "text": "keep going",
+        "next": "scene_006"
+      },
+    ]
+  },
+},
+  "scene_006": {
+    "title": "Final Boss Fight",
+    "video": "videos/final.mp4",
+    "choices": [
+      {
+        "text": "Dodge",
+        "next": "scene_007"
+      },
+      {
+        "text": "Atack",
+        "next": "scene_009"
+      }
+    ]
+  },
+  "scene_007": {
+    "title": "Dodge",
+    "video": "videos/1dodge.mp4",
+    "choices": [
+      {
+        "text": "Dodge again",
+        "next": "scene_010"
+      },
+      {
+        "text": "Atack",
+        "next": "scene_008"
+      }
+    ]
+  },
+  "scene_008": {
+    "title": "Atack after dodge you win",
+    "video": "videos/2atack.mp4",
+    "choices": []
+  }
+}
+ },
+},
+  "scene_009": {
+    "title": "Atack first you die",
+    "video": "videos/1atack.mp4",
+    "choices": []
+  }
+}
+ },
+},
+  "scene_010": {
+    "title": "dodge twice you die",
+    "video": "videos/2dodge.mp4",
+    "choices": []
+  }
+}
+ },
