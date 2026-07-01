@@ -50,7 +50,6 @@ function rebuild() {
         cy.destroy();
         cy = null;
     }
-    // Force a small delay to ensure DOM is ready
     setTimeout(() => {
         buildGraph();
         document.getElementById("properties").innerHTML =
@@ -122,10 +121,11 @@ function buildGraph() {
                 }
             ],
             layout: {
-                name: "cose-bilkent", 
+                name: "dagre", 
                 animate: true,
                 padding: 40,
-                nodeDimensionsIncludeLabels: true
+                nodeDimensionsIncludeLabels: true,
+                rankDir: "TB" // Top to Bottom flow
             },
             minZoom: 0.1,
             maxZoom: 2,
@@ -138,7 +138,7 @@ function buildGraph() {
             if (connectMode) {
                 if (connectSource === null) {
                     connectSource = id;
-                    evt.target.style("background-color", "#FF9800"); // Highlight source
+                    evt.target.style("background-color", "#FF9800");
                     alert("Now click the destination scene.");
                     return;
                 }
@@ -154,13 +154,9 @@ function buildGraph() {
                     });
                     autoSave();
                     rebuild();
-                } else {
-                    // Cancel connection
-                    cy.$(`#${connectSource}`).style("background-color", "#4CAF50");
                 }
                 connectSource = null;
                 connectMode = false;
-                // Reset button visual if needed
                 const btn = document.querySelector("button:contains('Connect')");
                 if(btn) btn.style.background = "";
                 return;
@@ -170,7 +166,6 @@ function buildGraph() {
             showProperties();
         });
         
-        // Reset connect mode if clicking on empty space
         cy.on("tap", function(evt){
             if(evt.target === cy){
                 if (connectMode && connectSource) {
@@ -226,7 +221,7 @@ function saveScene() {
     scenes[selectedScene].video = document.getElementById("videoInput").value;
     autoSave();
     rebuild();
-    showProperties(); // Re-render properties to keep focus
+    showProperties();
 }
 
 function addChoice() {
@@ -286,7 +281,6 @@ function setupToolbar() {
     const toolbar = document.getElementById("toolbar");
     if (!toolbar) return;
 
-    // Clear existing buttons to prevent duplicates
     toolbar.innerHTML = "";
 
     const addSceneBtn = document.createElement("button");
@@ -404,7 +398,6 @@ function importScenes(event) {
         }
     };
     reader.readAsText(file);
-    // Reset input so same file can be selected again if needed
     event.target.value = "";
 }
 
