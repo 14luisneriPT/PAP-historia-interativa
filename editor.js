@@ -50,9 +50,12 @@ function rebuild() {
         cy.destroy();
         cy = null;
     }
-    buildGraph();
-    document.getElementById("properties").innerHTML =
-        "<h2>Select a scene</h2><p>Click any node.</p>";
+    // Force a small delay to ensure DOM is ready
+    setTimeout(() => {
+        buildGraph();
+        document.getElementById("properties").innerHTML =
+            "<h2>Select a scene</h2><p>Click any node to edit.</p>";
+    }, 50);
 }
 
 function buildGraph() {
@@ -81,82 +84,109 @@ function buildGraph() {
         });
     });
 
-    cy = cytoscape({
-        container: document.getElementById("graph"),
-        elements: elements,
-        style: [
-            {
-                selector: "node",
-                style: {
-                    "label": "data(label)",
-                    "background-color": "#4CAF50",
-                    "color": "white",
-                    "width": 90,
-                    "height": 90,
-                    "text-wrap": "wrap",
-                    "text-max-width": 80,
-                    "text-valign": "center",
-                    "text-halign": "center",
-                    "border-width": 2,
-                    "border-color": "#333"
+    try {
+        cy = cytoscape({
+            container: document.getElementById("graph"),
+            elements: elements,
+            style: [
+                {
+                    selector: "node",
+                    style: {
+                        "label": "data(label)",
+                        "background-color": "#4CAF50",
+                        "color": "white",
+                        "width": 90,
+                        "height": 90,
+                        "text-wrap": "wrap",
+                        "text-max-width": 80,
+                        "text-valign": "center",
+                        "text-halign": "center",
+                        "border-width": 2,
+                        "border-color": "#333",
+                        "font-size": "12px"
+                    }
+                },
+                {
+                    selector: "edge",
+                    style: {
+                        "label": "data(label)",
+                        "width": 2,
+                        "curve-style": "bezier",
+                        "target-arrow-shape": "triangle",
+                        "line-color": "#555",
+                        "target-arrow-color": "#555",
+                        "font-size": "10px",
+                        "text-outline-color": "#111",
+                        "text-outline-width": 1
+                    }
                 }
+            ],
+            layout: {
+                name: "cose-bilkent", 
+                animate: true,
+                padding: 40,
+                nodeDimensionsIncludeLabels: true
             },
-            {
-                selector: "edge",
-                style: {
-                    "label": "data(label)",
-                    "width": 2,
-                    "curve-style": "bezier",
-                    "target-arrow-shape": "triangle",
-                    "line-color": "#555",
-                    "target-arrow-color": "#555"
+            minZoom: 0.1,
+            maxZoom: 2,
+            wheelSensitivity: 0.2
+        });
+
+        cy.on("tap", "node", function(evt){
+            const id = evt.target.id();
+
+            if (connectMode) {
+                if (connectSource === null) {
+                    connectSource = id;
+                    evt.target.style("background-color", "#FF9800"); // Highlight source
+                    alert("Now click the destination scene.");
+                    return;
                 }
-            }
-        ],
-        layout: {
-            name: "cose",
-            animate: true,
-            padding: 40
-        }
-    });
 
-    cy.ready(function() {
-        cy.resize();
-        cy.fit();
-        cy.center();
-        
-        if (elements.length === 0) {
-            cy.center();
-        }
-    });
-
-    cy.on("tap", "node", function(evt){
-        const id = evt.target.id();
-
-        if (connectMode) {
-            if (connectSource === null) {
-                connectSource = id;
-                alert("Now click the destination scene.");
+                const text = prompt("Choice text:");
+                if (text) {
+                    if (!scenes[connectSource].choices) {
+                        scenes[connectSource].choices = [];
+                    }
+                    scenes[connectSource].choices.push({
+                        text: text,
+                        next: id
+                    });
+                    autoSave();
+                    rebuild();
+                } else {
+                    // Cancel connection
+                    cy.$(`#${connectSource}`).style("background-color", "#4CAF50");
+                }
+                connectSource = null;
+                connectMode = false;
+                // Reset button visual if needed
+                const btn = document.querySelector("button:contains('Connect')");
+                if(btn) btn.style.background = "";
                 return;
             }
 
-            const text = prompt("Choice text:");
-            if (text) {
-                scenes[connectSource].choices.push({
-                    text: text,
-                    next: id
-                });
-                autoSave();
-                rebuild();
+            selectedScene = id;
+            showProperties();
+        });
+        
+        // Reset connect mode if clicking on empty space
+        cy.on("tap", function(evt){
+            if(evt.target === cy){
+                if (connectMode && connectSource) {
+                    cy.$(`#${connectSource}`).style("background-color", "#4CAF50");
+                    connectSource = null;
+                    connectMode = false;
+                    const btn = document.querySelector("button:contains('Connect')");
+                    if(btn) btn.style.background = "";
+                }
             }
-            connectSource = null;
-            connectMode = false;
-            return;
-        }
+        });
 
-        selectedScene = id;
-        showProperties();
-    });
+    } catch (err) {
+        console.error("Cytoscape initialization error:", err);
+        document.getElementById("graph").innerHTML = "<p style='color:white; padding:20px;'>Error loading graph. Check console.</p>";
+    }
 }
 
 function showProperties() {
@@ -169,21 +199,21 @@ function showProperties() {
         <label>Title</label>
         <input id="titleInput" value="${scene.title || ""}">
 
-        <label>Video</label>
+        <label>Video Path</label>
         <input id="videoInput" value="${scene.video || ""}">
 
         <br><br>
 
-        <button onclick="saveScene()"> Save</button>
+        <button onclick="saveScene()"> Save Changes</button>
         <button onclick="addChoice()"> Add Choice</button>
-        <button onclick="deleteScene()"> Delete Scene</button>
+        <button onclick="deleteScene()" style="background:#f44336; color:white;"> Delete Scene</button>
         <hr>
         <h3>Choices</h3>
         <ul>
             ${(scene.choices || []).map((choice, index) => `
-                <li>
-                    ${choice.text} → ${choice.next}
-                    <button onclick="deleteChoice(${index})">X</button>
+                <li style="margin-bottom:5px; display:flex; justify-content:space-between; align-items:center;">
+                    <span>${choice.text} → ${choice.next}</span>
+                    <button onclick="deleteChoice(${index})" style="padding:2px 8px; background:#f44336; color:white; border:none; cursor:pointer;">X</button>
                 </li>
             `).join("")}
         </ul>
@@ -196,6 +226,7 @@ function saveScene() {
     scenes[selectedScene].video = document.getElementById("videoInput").value;
     autoSave();
     rebuild();
+    showProperties(); // Re-render properties to keep focus
 }
 
 function addChoice() {
@@ -204,14 +235,17 @@ function addChoice() {
     const text = prompt("Choice text:");
     if (text === null) return;
 
-    const target = prompt("Destination Scene ID:");
+    const target = prompt("Destination Scene ID (e.g., scene_002):");
     if (target === null) return;
 
     if (!scenes[target]) {
-        alert("That scene doesn't exist.");
+        alert("That scene ID does not exist. Create it first.");
         return;
     }
 
+    if (!scenes[selectedScene].choices) {
+        scenes[selectedScene].choices = [];
+    }
     scenes[selectedScene].choices.push({
         text: text,
         next: target
@@ -219,6 +253,7 @@ function addChoice() {
 
     autoSave();
     rebuild();
+    showProperties();
 }
 
 function deleteChoice(index) {
@@ -226,28 +261,32 @@ function deleteChoice(index) {
     scenes[selectedScene].choices.splice(index, 1);
     autoSave();
     rebuild();
-    selectedScene = null;
+    showProperties();
 }
 
 function deleteScene() {
     if (!selectedScene) return;
-    if (!confirm("Delete this scene?")) return;
+    if (!confirm("Are you sure you want to delete this scene?")) return;
 
     delete scenes[selectedScene];
 
     Object.values(scenes).forEach(scene => {
-        scene.choices = (scene.choices || []).filter(choice => choice.next !== selectedScene);
+        if (scene.choices) {
+            scene.choices = scene.choices.filter(choice => choice.next !== selectedScene);
+        }
     });
 
     selectedScene = null;
     autoSave();
     rebuild();
+    document.getElementById("properties").innerHTML = "<h2>Select a scene</h2><p>Click any node to edit.</p>";
 }
 
 function setupToolbar() {
     const toolbar = document.getElementById("toolbar");
     if (!toolbar) return;
 
+    // Clear existing buttons to prevent duplicates
     toolbar.innerHTML = "";
 
     const addSceneBtn = document.createElement("button");
@@ -280,11 +319,14 @@ function setupToolbar() {
         connectMode = !connectMode;
         connectSource = null;
         if (connectMode) {
-            connectBtn.style.background = "#4CAF50";
-            alert("Click the first scene, then the destination scene.");
+            connectBtn.style.background = "#FF9800";
+            connectBtn.style.color = "black";
+            alert("Click the first scene, then click the destination scene.");
         } else {
             connectBtn.style.background = "";
+            connectBtn.style.color = "";
             alert("Connect mode disabled.");
+            if (cy) cy.$(":selected").style("background-color", "#4CAF50");
         }
     };
     toolbar.appendChild(connectBtn);
@@ -293,7 +335,7 @@ function setupToolbar() {
     saveBtn.textContent = " Save";
     saveBtn.onclick = function () {
         autoSave();
-        alert("Project saved.");
+        alert("Project saved to browser storage.");
     };
     toolbar.appendChild(saveBtn);
 
@@ -309,15 +351,10 @@ function setupToolbar() {
     };
     toolbar.appendChild(importBtn);
 
-    const importFileInput = document.getElementById("importFile");
-    if (importFileInput) {
-        importFileInput.addEventListener("change", importScenes);
-    }
-
     const resetBtn = document.createElement("button");
     resetBtn.textContent = " Reset";
     resetBtn.onclick = function () {
-        if (!confirm("Delete local save?")) return;
+        if (!confirm("Delete local save and reload default?")) return;
         localStorage.removeItem("storyProject");
         location.reload();
     };
@@ -367,6 +404,8 @@ function importScenes(event) {
         }
     };
     reader.readAsText(file);
+    // Reset input so same file can be selected again if needed
+    event.target.value = "";
 }
 
 window.addEventListener("beforeunload", function () {
