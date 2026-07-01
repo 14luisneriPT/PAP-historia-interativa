@@ -120,13 +120,11 @@ function buildGraph() {
                     }
                 }
             ],
-            // This line uses the built-in 'dagre' layout
+            // Using 'grid' layout which is built-in and requires no extensions
             layout: {
-                name: "dagre", 
-                animate: true,
-                padding: 40,
-                nodeDimensionsIncludeLabels: true,
-                rankDir: "TB"
+                name: "grid",
+                rows: 2,
+                padding: 30
             },
             minZoom: 0.1,
             maxZoom: 2,
