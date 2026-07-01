@@ -147,10 +147,10 @@ function buildGraph() {
 
         ],
 
-        layout: {
-
-            name: "breadthfirst",
-            directed: true,
+        layout:{
+    name:"cose",
+    animate:true
+}
             padding: 40
 
         }
