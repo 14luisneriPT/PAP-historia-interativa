@@ -62,7 +62,7 @@ function buildGraph() {
 
     Object.keys(scenes).forEach(id => {
         const scene = scenes[id];
-        
+
         elements.push({
             data: {
                 id: id,
@@ -120,7 +120,6 @@ function buildGraph() {
                     }
                 }
             ],
-            // Using 'grid' layout which is built-in and requires no extensions
             layout: {
                 name: "grid",
                 rows: 2,
@@ -164,7 +163,7 @@ function buildGraph() {
             selectedScene = id;
             showProperties();
         });
-        
+
         cy.on("tap", function(evt){
             if(evt.target === cy){
                 if (connectMode && connectSource) {
@@ -286,11 +285,11 @@ function setupToolbar() {
     addSceneBtn.textContent = "New Scene";
     addSceneBtn.onclick = function () {
         sceneCounter++;
-        let id = "scene_" + sceneCounter;
+        let id = "scene_" + String(sceneCounter).padStart(3, "0");
 
         while (scenes[id]) {
             sceneCounter++;
-            id = "scene_" + sceneCounter;
+            id = "scene_" + String(sceneCounter).padStart(3, "0");
         }
 
         scenes[id] = {
@@ -344,6 +343,13 @@ function setupToolbar() {
     };
     toolbar.appendChild(importBtn);
 
+    // FIX: the file input existed in editor.html but nothing was ever
+    // listening for its "change" event, so picking a file did nothing.
+    const importFileInput = document.getElementById("importFile");
+    if (importFileInput) {
+        importFileInput.addEventListener("change", importScenes);
+    }
+
     const resetBtn = document.createElement("button");
     resetBtn.textContent = " Reset";
     resetBtn.onclick = function () {
@@ -368,7 +374,9 @@ function exportScenes() {
 }
 
 function importScenes(event) {
-    const file = event.target.files;
+    // FIX: event.target.files is a FileList, not a File — FileReader needs
+    // a single File object, so this was passing the wrong type in.
+    const file = event.target.files[0];
     if (!file) return;
 
     const reader = new FileReader();
