@@ -1,5 +1,4 @@
 /* ---------- EDITOR ---------- */
-
 body {
   margin: 0;
   background: black;
@@ -7,7 +6,6 @@ body {
   height: 100vh;
   overflow: hidden;
 }
-
 #toolbar {
   background: #222;
   color: white;
@@ -16,17 +14,14 @@ body {
   display: flex;
   align-items: center;
 }
-
 #toolbar button {
   margin-right: 10px;
 }
-
 #editor {
   display: flex;
   height: calc(100vh - 60px);
   width: 100%;
 }
-
 #graph {
   flex: 4;
   background: #111;
@@ -34,7 +29,6 @@ body {
   height: 100%;
   min-height: 400px; /* Added fallback */
 }
-
 #properties {
   flex: 1;
   background: white;
@@ -44,23 +38,19 @@ body {
   min-width: 300px;
   max-width: 400px;
 }
-
 #properties input {
   width: 100%;
   padding: 8px;
   margin-bottom: 10px;
   box-sizing: border-box;
 }
-
 #properties button {
   width: 100%;
   padding: 10px;
   margin-top: 10px;
   cursor: pointer;
 }
-
 /* ---------- GAME ---------- */
-
 .container {
   position: relative;
   width: 80%;
@@ -68,12 +58,11 @@ body {
   margin: auto;
   padding-top: 40px;
 }
-
 video {
   width: 100%;
 }
-
-.choices {
+/* FIX: was ".choices" but index.html uses id="choices", so this never applied */
+#choices {
   position: absolute;
   bottom: 50px;
   width: 100%;
@@ -81,13 +70,11 @@ video {
   justify-content: center;
   gap: 20px;
 }
-
 button {
   padding: 10px 15px;
   font-size: 16px;
   cursor: pointer;
 }
-
 #map {
   position: fixed;
   inset: 0;
@@ -98,7 +85,6 @@ button {
   padding: 20px;
   overflow: auto;
 }
-
 .map-node {
   background: white;
   color: black;
@@ -108,7 +94,6 @@ button {
   min-width: 120px;
   text-align: center;
 }
-
 .map-line {
   color: white;
 }
