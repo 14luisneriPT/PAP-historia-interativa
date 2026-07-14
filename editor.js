@@ -57,6 +57,17 @@ function rebuild() {
     }, 50);
 }
 
+function computeRoots(elements) {
+    const allIds = new Set();
+    const targetIds = new Set();
+    elements.forEach(el => {
+        if (el.data.id) allIds.add(el.data.id);
+        if (el.data.target) targetIds.add(el.data.target);
+    });
+    const roots = [...allIds].filter(id => !targetIds.has(id));
+    return roots.length ? roots : [...allIds].slice(0, 1);
+}
+
 function buildGraph() {
     const elements = [];
 
@@ -121,9 +132,12 @@ function buildGraph() {
                 }
             ],
             layout: {
-                name: "grid",
-                rows: 2,
-                padding: 30
+                name: "breadthfirst",
+                directed: true,
+                roots: computeRoots(elements),
+                padding: 30,
+                spacingFactor: 1.5,
+                avoidOverlap: true
             },
             minZoom: 0.1,
             maxZoom: 2,
