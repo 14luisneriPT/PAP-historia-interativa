@@ -96,3 +96,15 @@
     "choices": []
   }
 }
+ },
+  "scene_011": {
+    "title": "Attack first - You Die",
+    "video": "videos/1atack.mp4",
+    "choices": []
+  },
+  "scene_012": {
+    "title": "Dodge twice - You Die",
+    "video": "videos/2dodge.mp4",
+    "choices": []
+  }
+}
