@@ -220,7 +220,10 @@ function showProperties() {
             ${(scene.choices || []).map((choice, index) => `
                 <li style="margin-bottom:5px; display:flex; justify-content:space-between; align-items:center;">
                     <span>${choice.text} → ${choice.next}</span>
-                    <button onclick="deleteChoice(${index})" style="padding:2px 8px; background:#f44336; color:white; border:none; cursor:pointer;">X</button>
+                    <span>
+                        <button onclick="editChoice(${index})" style="padding:2px 8px; margin-right:4px; cursor:pointer;">Edit</button>
+                        <button onclick="deleteChoice(${index})" style="padding:2px 8px; background:#f44336; color:white; border:none; cursor:pointer;">X</button>
+                    </span>
                 </li>
             `).join("")}
         </ul>
@@ -258,6 +261,17 @@ function addChoice() {
         next: target
     });
 
+    autoSave();
+    rebuild();
+    showProperties();
+}
+
+function editChoice(index) {
+    if (!selectedScene) return;
+    const choice = scenes[selectedScene].choices[index];
+    const newText = prompt("Choice text:", choice.text);
+    if (newText === null || newText === "") return;
+    choice.text = newText;
     autoSave();
     rebuild();
     showProperties();
